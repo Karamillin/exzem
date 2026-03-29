@@ -3,8 +3,8 @@ from __future__ import annotations
 from datetime import date
 from typing import Callable
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -36,6 +36,10 @@ class HistoryTab(QWidget):
         row.addStretch()
         row.addWidget(refresh_btn)
 
+        tip = QLabel("Подсказка: двойной клик по строке откроет запись в форме редактирования.")
+        tip.setStyleSheet("color: #475569;")
+
+        root.addWidget(tip)
         root.addLayout(row)
         root.addWidget(self.items)
 
@@ -43,7 +47,9 @@ class HistoryTab(QWidget):
         entries = self.repository.list_entries()
         self.items.clear()
         for entry in entries:
-            item = QListWidgetItem(f"{entry.entry_date.isoformat()} | {entry.day_result} | стресс {entry.stress_level}")
+            item = QListWidgetItem(
+                f"{entry.entry_date.isoformat()} | {entry.day_result} | стресс {entry.stress_level} | зуд {entry.itch}"
+            )
             item.setData(Qt.ItemDataRole.UserRole, entry.entry_date.isoformat())
             self.items.addItem(item)
         self.count_label.setText(f"Записей: {len(entries)}")

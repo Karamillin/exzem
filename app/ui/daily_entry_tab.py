@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
+from PyQt6.QtCore import Qt, QDate
+from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDateEdit,
@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QMessageBox,
     QPushButton,
+    QScrollArea,
     QSlider,
     QTextEdit,
     QVBoxLayout,
@@ -45,7 +46,7 @@ class DailyEntryTab(QWidget):
 
         self.entry_date = QDateEdit()
         self.entry_date.setCalendarPopup(True)
-        self.entry_date.setDate(date.today())
+        self.entry_date.setDate(QDate.currentDate())
 
         skin_box = self._build_skin_group()
         stress_box = self._build_stress_group()
@@ -77,9 +78,17 @@ class DailyEntryTab(QWidget):
         save_btn = QPushButton("Сохранить запись")
         save_btn.clicked.connect(self.save_entry)
 
-        root.addLayout(day_row)
-        root.addLayout(top_grid)
-        root.addWidget(save_btn, alignment=Qt.AlignmentFlag.AlignRight)
+        content = QWidget()
+        content_layout = QVBoxLayout(content)
+        content_layout.addLayout(day_row)
+        content_layout.addLayout(top_grid)
+        content_layout.addWidget(save_btn, alignment=Qt.AlignmentFlag.AlignRight)
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(content)
+
+        root.addWidget(scroll)
 
     def _build_skin_group(self) -> QGroupBox:
         box = QGroupBox("Состояние кожи")
@@ -204,7 +213,7 @@ class DailyEntryTab(QWidget):
     def save_entry(self) -> None:
         entry = DailyEntry(
             id=None,
-            entry_date=self.entry_date.date().toPython(),
+            entry_date=self.entry_date.date().toPyDate(),
             rash_present=self.rash_present.isChecked(),
             severity=self.severity.value(),
             itch=self.itch.value(),
@@ -239,7 +248,7 @@ class DailyEntryTab(QWidget):
         QMessageBox.information(self, "Готово", "Запись сохранена.")
 
     def load_entry(self, entry: DailyEntry) -> None:
-        self.entry_date.setDate(entry.entry_date)
+        self.entry_date.setDate(QDate(entry.entry_date.year, entry.entry_date.month, entry.entry_date.day))
         self.rash_present.setChecked(entry.rash_present)
         self.severity.setValue(entry.severity)
         self.itch.setValue(entry.itch)
