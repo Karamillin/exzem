@@ -1,0 +1,29 @@
+:root {
+  --bg: #f3f6ff;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #2563eb;
+}
+body {
+  background: radial-gradient(circle at top right, #dbeafe 0%, var(--bg) 50%);
+  color: var(--text);
+}
+.glass-nav {
+  background: rgba(255,255,255,.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e2e8f0;
+}
+.card, .hero {
+  background: var(--card);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(15,23,42,.06);
+}
+.hero {border-left: 4px solid var(--primary);}
+.stat .h3 {margin: 0; font-weight: 700;}
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: none;
+}
+.form-range::-webkit-slider-thumb { background: var(--primary); }

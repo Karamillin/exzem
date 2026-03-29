@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Главная — Экзема-трекер{% endblock %}
+{% block content %}
+<div class="hero p-4 mb-4">
+  <h1 class="h3">Персональный дневник-трекер</h1>
+  <p class="text-secondary mb-0">Это система наблюдений. Она не ставит диагноз, а показывает вероятные совпадения факторов с ухудшениями.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card stat p-3"><div class="small text-secondary">Всего записей</div><div class="h3">{{ report.total_entries }}</div></div></div>
+  <div class="col-md-3"><div class="card stat p-3"><div class="small text-secondary">Дни ухудшения</div><div class="h3">{{ report.worsening_days }}</div></div></div>
+  <div class="col-md-3"><div class="card stat p-3"><div class="small text-secondary">Обычные дни</div><div class="h3">{{ report.normal_days }}</div></div></div>
+  <div class="col-md-3"><div class="card stat p-3"><div class="small text-secondary">Улучшение/ремиссия</div><div class="h3">{{ report.improving_days }}</div></div></div>
+</div>
+
+<div class="card p-4 mb-4">
+  <h2 class="h5">Быстрый вывод</h2>
+  <p class="mb-2">{{ report.worsening_explanation }}</p>
+  <p class="mb-0 text-success">{{ report.improvement_explanation }}</p>
+</div>
+
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Последние записи</h2>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('web.new_entry') }}">Добавить запись</a>
+  </div>
+  <ul class="list-group list-group-flush">
+    {% for e in entries %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span>{{ e.entry_date }}</span><span class="badge text-bg-light">{{ e.day_result }}</span>
+      </li>
+    {% else %}
+      <li class="list-group-item">Пока нет записей.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

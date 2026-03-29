@@ -1,26 +1,21 @@
-# Экзема-трекер (MVP)
+# Экзема-трекер (Web, офлайн)
 
-Оффлайн десктоп-приложение на Python + **PyQt6** + SQLite для ежедневного ведения дневника и поиска предполагаемых триггеров дисгидротической экземы.
+Полностью русскоязычное **веб-приложение** на Python + Flask + SQLite для ежедневного ведения дневника дисгидротической экземы и поиска предполагаемых триггеров.
 
-## Архитектура
+> Важно: приложение не ставит диагноз, а показывает только вероятные совпадения факторов.
 
-Выбрана **MVVM-подобная** схема (для Qt это практично):
+## 1) Архитектура проекта
 
-- **UI Layer (`app/ui`)**: формы, история, аналитика, web-style оболочка.
-- **Domain (`app/domain`)**: dataclass-модели `DailyEntry`, `TriggerScore`, `AnalyticsReport`.
-- **Data Layer (`app/data`)**: SQLite схема + репозиторий CRUD.
-- **Services (`app/services`)**: аналитика, подсчёты, текстовые объяснения.
+Используется слоистая архитектура:
 
-Почему не чистый MVC: в Qt удобнее держать состояние формы в виджете, а вычисления выносить в сервисы/репозитории.
+- **UI Layer (Web UI)**: Jinja2 шаблоны + CSS + Bootstrap (`app/web/templates`, `app/web/static`).
+- **Domain Logic**: модели `DailyEntry`, `TriggerScore`, `AnalyticsReport` (`app/domain/models.py`).
+- **Data Layer**: SQLite и репозиторий (`app/data/database.py`, `app/data/repository.py`).
+- **Services**: аналитика/расчёты (`app/services/analytics_service.py`).
 
-## Что улучшено по UX
+Паттерн: **MVC для веба** (routes/controller + templates/view + repository/service/model).
 
-- Web-подобный интерфейс в стиле dashboard (боковое меню + страницы).
-- Единая тема (мягкие цвета, card-like блоки, контрастные кнопки).
-- Прокручиваемая форма ввода (удобно на небольших экранах).
-- В аналитике добавлена HTML-панель объяснений через `QWebEngineView`.
-
-## Структура проекта
+## 2) Структура файлов
 
 ```text
 app/
@@ -29,39 +24,56 @@ app/
   data/database.py
   data/repository.py
   services/analytics_service.py
-  ui/main_window.py
-  ui/daily_entry_tab.py
-  ui/history_tab.py
-  ui/analytics_tab.py
-  ui/theme.py
+  web/
+    __init__.py
+    routes.py
+    templates/
+      base.html
+      dashboard.html
+      entry_form.html
+      history.html
+      analytics.html
+    static/
+      style.css
 run.py
 requirements.txt
 ```
 
-## База данных
+## 3) Схема базы данных
 
-Таблицы:
-- `entries` — основная запись дня
-- `symptoms` — расширяемая таблица симптомов
-- `triggers_food` — пищевые триггеры
-- `triggers_contact` — контактные триггеры
-- `custom_triggers` — словарь пользовательских триггеров
-- `photos` — привязка фото к записи
+SQLite таблицы:
 
-## MVP-функциональность
+- `entries`
+- `symptoms`
+- `triggers_food`
+- `triggers_contact`
+- `custom_triggers`
+- `photos`
 
-- Ввод ежедневной записи (все блоки из ТЗ).
-- Сохранение/обновление записи по дате.
-- История записей с быстрым открытием.
-- Аналитика:
-  - `score = worsening_frequency - normal_frequency`
-  - классификация силы связи
-  - текст «возможных причин ухудшения»
-  - факторы, чаще встречающиеся в улучшениях
-  - график score по топ-факторам
-  - HTML-блок с интуитивным объяснением результатов
+## 4) UI (экраны)
 
-## Запуск
+- **Главная**: карточки со сводкой, быстрый вывод аналитики, последние записи.
+- **Новая запись**: большая форма с секциями по ТЗ.
+- **История**: таблица всех записей.
+- **Аналитика**: текстовые объяснения, график Plotly, ranking-таблица факторов.
+
+## 5) Реализация аналитики
+
+Базовая логика:
+
+- `score = frequency_in_worsening - frequency_in_normal`
+- `> 0.4` высокая связь
+- `0.2–0.4` средняя
+- `0.1–0.2` слабая
+- `< 0.1` явной связи нет
+
+## 6) Код по модулям
+
+- `app/web/routes.py`: маршруты, парсинг формы, подготовка данных для страниц.
+- `app/services/analytics_service.py`: подсчёт частот/score, тексты объяснений.
+- `app/data/repository.py`: сохранение, чтение, upsert по дате.
+
+## 7) Инструкция запуска
 
 ```bash
 python -m venv .venv
@@ -70,11 +82,13 @@ pip install -r requirements.txt
 python run.py
 ```
 
-## Сборка в exe
+Откройте: `http://127.0.0.1:5000`
+
+## 8) Сборка в .exe
 
 ```bash
 pip install pyinstaller
-pyinstaller --noconfirm --onefile --windowed --name eczema_tracker run.py
+pyinstaller --noconfirm --onefile --name eczema_tracker_web run.py
 ```
 
-Готовый exe появится в `dist/eczema_tracker.exe`.
+Запуск exe поднимет локальный сервер Flask.

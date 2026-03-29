@@ -1,39 +1,9 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from app.web import create_app
 
-from PyQt6.QtWidgets import QApplication
-
-from app.data.database import Database
-from app.data.repository import EntryRepository
-from app.services.analytics_service import AnalyticsService
-from app.ui.main_window import MainWindow
-from app.ui.theme import APP_STYLESHEET
-
-
-def build_app() -> QApplication:
-    app = QApplication(sys.argv)
-    app.setApplicationName("Экзема-трекер")
-    app.setOrganizationName("Локально")
-    app.setStyleSheet(APP_STYLESHEET)
-    return app
-
-
-def main() -> int:
-    db_path = Path("eczema_tracker.db")
-    database = Database(db_path)
-    database.initialize()
-
-    repository = EntryRepository(database)
-    analytics = AnalyticsService(repository)
-
-    app = build_app()
-    window = MainWindow(repository, analytics)
-    window.show()
-
-    return app.exec()
+app = create_app()
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    app.run(debug=True)

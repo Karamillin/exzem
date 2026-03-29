@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Новая запись{% endblock %}
+{% block content %}
+<form method="post" class="vstack gap-3">
+  <div class="card p-4">
+    <h1 class="h4">Запись за день</h1>
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Дата</label><input class="form-control" type="date" name="entry_date" value="{{ today }}" required></div>
+      <div class="col-md-4"><label class="form-label">Итог дня</label>
+        <select class="form-select" name="day_result"><option>worsening</option><option>neutral</option><option>improvement</option><option>remission</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4"><h2 class="h5">Состояние кожи</h2>
+    <div class="row g-3">
+      <div class="col-md-2 form-check ms-2"><input class="form-check-input" type="checkbox" name="rash_present" id="rash"><label class="form-check-label" for="rash">Есть сыпь</label></div>
+      {% for n,label in [('severity','Тяжесть'),('itch','Зуд'),('burning','Жжение'),('dryness','Сухость')] %}
+      <div class="col-md-3"><label class="form-label">{{ label }} (0–10)</label><input class="form-range" type="range" min="0" max="10" name="{{ n }}"></div>
+      {% endfor %}
+      <div class="col-12"><label class="form-label">Локализация</label>{% for v in location_presets %}<div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="location" value="{{ v }}"><label class="form-check-label">{{ v }}</label></div>{% endfor %}</div>
+      <div class="col-12"><label class="form-label">Комментарий</label><textarea class="form-control" name="comment" rows="2"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card p-4"><h2 class="h5">Стресс, среда, ЖКТ</h2>
+    <div class="row g-3">
+      <div class="col-md-3"><label class="form-label">Стресс (0–10)</label><input class="form-range" type="range" min="0" max="10" name="stress_level"></div>
+      <div class="col-md-3"><label class="form-label">Сон (часы)</label><input class="form-control" type="number" min="0" max="12" value="7" name="sleep_hours"></div>
+      <div class="col-md-3"><label class="form-label">Качество сна (0–10)</label><input class="form-range" type="range" min="0" max="10" name="sleep_quality"></div>
+      <div class="col-md-3"><label class="form-label">Самочувствие (0–10)</label><input class="form-range" type="range" min="0" max="10" name="wellbeing"></div>
+      <div class="col-md-3"><label class="form-label">Потливость (0–10)</label><input class="form-range" type="range" min="0" max="10" name="sweating"></div>
+      <div class="col-12">
+        {% for chk,label in [('strong_stress','Сильный стресс'),('heat','Жара'),('wet_skin','Влажная кожа'),('friction','Трение'),('gi_issues','Симптомы ЖКТ')] %}
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="{{ chk }}" value="on" id="{{ chk }}"><label class="form-check-label" for="{{ chk }}">{{ label }}</label></div>
+        {% endfor %}
+      </div>
+      <div class="col-md-4"><label class="form-label">ЖКТ тяжесть (0–10)</label><input class="form-range" type="range" min="0" max="10" name="gi_severity"></div>
+      <div class="col-md-8"><label class="form-label">Симптомы ЖКТ</label>{% for v in gi_presets %}<div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="gi_symptoms" value="{{ v }}"><label class="form-check-label">{{ v }}</label></div>{% endfor %}</div>
+      <div class="col-12"><label class="form-label">Комментарий ЖКТ</label><textarea class="form-control" name="gi_comment" rows="2"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card p-4"><h2 class="h5">Триггеры и лечение</h2>
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Пищевые триггеры</label>{% for v in food_presets %}<div class="form-check"><input class="form-check-input" type="checkbox" name="food_triggers" value="{{ v }}"><label class="form-check-label">{{ v }}</label></div>{% endfor %}<input class="form-control mt-2" name="food_custom" placeholder="Кастомные через запятую"></div>
+      <div class="col-md-6"><label class="form-label">Контактные триггеры</label>{% for v in contact_presets %}<div class="form-check"><input class="form-check-input" type="checkbox" name="contact_triggers" value="{{ v }}"><label class="form-check-label">{{ v }}</label></div>{% endfor %}<input class="form-control mt-2" name="contact_custom" placeholder="Кастомные через запятую"></div>
+      <div class="col-12">
+        {% for chk,label in [('moisturizer','Увлажнение'),('medication','Медикаменты'),('antihistamines','Антигистаминные'),('steroids','Стероиды')] %}
+          <div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" name="{{ chk }}" value="on"><label class="form-check-label">{{ label }}</label></div>
+        {% endfor %}
+      </div>
+      <div class="col-md-6"><label class="form-label">Другое лечение</label><input class="form-control" name="treatment_other"></div>
+      <div class="col-md-6"><label class="form-label">Фото (по одному пути на строку)</label><textarea class="form-control" name="photo_paths" rows="3" placeholder="C:\\photo1.jpg"></textarea></div>
+    </div>
+  </div>
+
+  <div class="text-end"><button class="btn btn-primary btn-lg">Сохранить запись</button></div>
+</form>
+{% endblock %}
