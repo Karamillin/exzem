@@ -13,6 +13,23 @@ FOOD_PRESETS = ["цитрусы", "острое", "сладкое", "молоч�
 CONTACT_PRESETS = ["бытовая химия", "перчатки", "мыло", "металл", "косметика"]
 GI_PRESETS = ["вздутие", "боль", "тошнота", "изжога", "неустойчивый стул"]
 LOCATION_PRESETS = ["ладони", "пальцы", "стопы", "запястья", "другое"]
+DAY_RESULT_OPTIONS = [
+    ("worsening", "Ухудшение"),
+    ("neutral", "Без изменений"),
+    ("improvement", "Улучшение"),
+    ("remission", "Ремиссия"),
+]
+FACTOR_LABELS = {
+    "high_stress": "Высокий стресс",
+    "strong_stress": "Сильный стресс",
+    "high_sweating": "Высокая потливость",
+    "heat": "Жара",
+    "wet_skin": "Влажная кожа",
+    "friction": "Трение кожи",
+    "gi_issues": "Симптомы ЖКТ",
+    "poor_sleep": "Недостаточный сон",
+    "rash_present": "Наличие сыпи",
+}
 
 
 @web_bp.get("/")
@@ -21,7 +38,12 @@ def dashboard():
     analytics = current_app.config["analytics"]
     entries = repo.list_entries()
     report = analytics.build_report()
-    return render_template("dashboard.html", entries=entries[:7], report=report)
+    return render_template(
+        "dashboard.html",
+        entries=entries[:7],
+        report=report,
+        day_result_label=human_day_result,
+    )
 
 
 @web_bp.route("/entries/new", methods=["GET", "POST"])
@@ -38,6 +60,7 @@ def new_entry():
         contact_presets=CONTACT_PRESETS,
         gi_presets=GI_PRESETS,
         location_presets=LOCATION_PRESETS,
+        day_result_options=DAY_RESULT_OPTIONS,
         today=date.today().isoformat(),
     )
 
@@ -47,7 +70,7 @@ def history():
     repo = current_app.config["repository"]
     saved = request.args.get("saved")
     entries = repo.list_entries()
-    return render_template("history.html", entries=entries, saved=saved)
+    return render_template("history.html", entries=entries, saved=saved, day_result_label=human_day_result)
 
 
 @web_bp.get("/analytics")
@@ -60,7 +83,7 @@ def analytics():
         fig = go.Figure(
             go.Bar(
                 x=[x.score for x in top],
-                y=[x.factor for x in top],
+                y=[human_factor_label(x.factor) for x in top],
                 orientation="h",
                 marker_color="#2563eb",
             )
@@ -77,7 +100,17 @@ def analytics():
     else:
         chart_html = "<p>Пока недостаточно данных для графика.</p>"
 
-    return render_template("analytics.html", report=report, chart_html=chart_html)
+    scores = [
+        {
+            "factor": human_factor_label(s.factor),
+            "worsening_frequency": s.worsening_frequency,
+            "normal_frequency": s.normal_frequency,
+            "score": s.score,
+            "relation": s.relation,
+        }
+        for s in report.trigger_scores
+    ]
+    return render_template("analytics.html", report=report, chart_html=chart_html, scores=scores)
 
 
 def _entry_from_form(form) -> DailyEntry:
@@ -130,3 +163,16 @@ def _entry_from_form(form) -> DailyEntry:
         photos=photos,
         day_result=form.get("day_result", "neutral"),
     )
+
+
+def human_day_result(value: str) -> str:
+    labels = dict(DAY_RESULT_OPTIONS)
+    return labels.get(value, value)
+
+
+def human_factor_label(factor: str) -> str:
+    if factor.startswith("food:"):
+        return f"Еда: {factor.removeprefix('food:').replace('custom:', '')}"
+    if factor.startswith("contact:"):
+        return f"Контакт: {factor.removeprefix('contact:').replace('custom:', '')}"
+    return FACTOR_LABELS.get(factor, factor)

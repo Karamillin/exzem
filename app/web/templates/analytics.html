@@ -14,7 +14,7 @@
     <table class="table table-sm table-striped">
       <thead><tr><th>Фактор</th><th>Ухудшение %</th><th>Обычные дни %</th><th>Score</th><th>Связь</th></tr></thead>
       <tbody>
-      {% for s in report.trigger_scores %}
+      {% for s in scores %}
         <tr><td>{{ s.factor }}</td><td>{{ '%.1f'|format(s.worsening_frequency*100) }}</td><td>{{ '%.1f'|format(s.normal_frequency*100) }}</td><td>{{ '%.3f'|format(s.score) }}</td><td>{{ s.relation }}</td></tr>
       {% else %}
         <tr><td colspan="5" class="text-center text-muted">Недостаточно данных</td></tr>

@@ -14,7 +14,7 @@
       {% for e in entries %}
         <tr>
           <td>{{ e.entry_date }}</td>
-          <td><span class="badge text-bg-light">{{ e.day_result }}</span></td>
+          <td><span class="badge text-bg-light">{{ day_result_label(e.day_result) }}</span></td>
           <td>{{ e.stress_level }}</td>
           <td>{{ e.itch }}</td>
           <td>{{ e.sweating }}</td>

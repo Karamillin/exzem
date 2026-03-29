@@ -7,7 +7,11 @@
     <div class="row g-3">
       <div class="col-md-4"><label class="form-label">Дата</label><input class="form-control" type="date" name="entry_date" value="{{ today }}" required></div>
       <div class="col-md-4"><label class="form-label">Итог дня</label>
-        <select class="form-select" name="day_result"><option>worsening</option><option>neutral</option><option>improvement</option><option>remission</option></select>
+        <select class="form-select" name="day_result">
+          {% for value,label in day_result_options %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
       </div>
     </div>
   </div>

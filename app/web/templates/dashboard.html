@@ -27,7 +27,7 @@
   <ul class="list-group list-group-flush">
     {% for e in entries %}
       <li class="list-group-item d-flex justify-content-between">
-        <span>{{ e.entry_date }}</span><span class="badge text-bg-light">{{ e.day_result }}</span>
+        <span>{{ e.entry_date }}</span><span class="badge text-bg-light">{{ day_result_label(e.day_result) }}</span>
       </li>
     {% else %}
       <li class="list-group-item">Пока нет записей.</li>

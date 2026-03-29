@@ -7,6 +7,18 @@ from app.domain.models import AnalyticsReport, DailyEntry, TriggerScore
 
 
 class AnalyticsService:
+    FACTOR_LABELS = {
+        "high_stress": "высокий стресс",
+        "strong_stress": "сильный стресс",
+        "high_sweating": "высокая потливость",
+        "heat": "жара",
+        "wet_skin": "влажная кожа",
+        "friction": "трение кожи",
+        "gi_issues": "симптомы ЖКТ",
+        "poor_sleep": "недостаточный сон",
+        "rash_present": "наличие сыпи",
+    }
+
     def __init__(self, repository: EntryRepository) -> None:
         self.repository = repository
 
@@ -115,7 +127,7 @@ class AnalyticsService:
         top = [s for s in scores if s.score >= 0.2][:5]
         if not top:
             return "Недостаточно данных для выделения устойчивых предполагаемых триггеров ухудшения."
-        parts = [t.factor.replace("food:", "еда: ").replace("contact:", "контакт: ") for t in top]
+        parts = [self._human_factor(t.factor) for t in top]
         return (
             "Возможные причины ухудшения: "
             + ", ".join(parts)
@@ -142,3 +154,10 @@ class AnalyticsService:
             return "Не найдено повторяющихся факторов улучшения."
         top = ", ".join([k for k, _ in counter.most_common(4)])
         return f"В дни улучшения чаще встречаются: {top}."
+
+    def _human_factor(self, factor: str) -> str:
+        if factor.startswith("food:"):
+            return f"еда: {factor.removeprefix('food:').replace('custom:', '')}"
+        if factor.startswith("contact:"):
+            return f"контакт: {factor.removeprefix('contact:').replace('custom:', '')}"
+        return self.FACTOR_LABELS.get(factor, factor)
