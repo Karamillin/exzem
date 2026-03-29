@@ -72,8 +72,9 @@ SQLite таблицы:
 - `app/web/routes.py`: маршруты, парсинг формы, подготовка данных для страниц.
 - `app/services/analytics_service.py`: подсчёт частот/score, тексты объяснений.
 - `app/data/repository.py`: сохранение, чтение, upsert по дате.
+- `run.py`: запуск локального web-сервера **и авто-открытие браузера**.
 
-## 7) Инструкция запуска
+## 7) Инструкция запуска (из исходников)
 
 ```bash
 python -m venv .venv
@@ -82,13 +83,23 @@ pip install -r requirements.txt
 python run.py
 ```
 
-Откройте: `http://127.0.0.1:5000`
+Откройте: `http://127.0.0.1:8765` (обычно откроется автоматически).
 
-## 8) Сборка в .exe
+## 8) Сборка в .exe (авто-запуск в браузере)
 
 ```bash
 pip install pyinstaller
-pyinstaller --noconfirm --onefile --name eczema_tracker_web run.py
+pyinstaller --noconfirm --onefile --windowed --name EczemaTracker run.py
 ```
 
-Запуск exe поднимет локальный сервер Flask.
+После запуска `EczemaTracker.exe`:
+1. стартует локальный сервер приложения;
+2. автоматически открывается браузер с приложением.
+
+Если порт `8765` занят, можно задать переменные окружения:
+
+```bash
+set ECZEMA_HOST=127.0.0.1
+set ECZEMA_PORT=8877
+EczemaTracker.exe
+```
