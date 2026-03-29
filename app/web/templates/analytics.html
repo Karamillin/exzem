@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Аналитика{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">Аналитика триггеров</h1>
+<div class="card p-4 mb-3">
+  <h2 class="h5">Возможные причины ухудшения</h2>
+  <p>{{ report.worsening_explanation }}</p>
+  <h2 class="h6 text-success">Факторы улучшения</h2>
+  <p class="mb-0">{{ report.improvement_explanation }}</p>
+</div>
+<div class="card p-3 mb-3">{{ chart_html|safe }}</div>
+<div class="card p-3">
+  <div class="table-responsive">
+    <table class="table table-sm table-striped">
+      <thead><tr><th>Фактор</th><th>Ухудшение %</th><th>Обычные дни %</th><th>Score</th><th>Связь</th></tr></thead>
+      <tbody>
+      {% for s in scores %}
+        <tr><td>{{ s.factor }}</td><td>{{ '%.1f'|format(s.worsening_frequency*100) }}</td><td>{{ '%.1f'|format(s.normal_frequency*100) }}</td><td>{{ '%.3f'|format(s.score) }}</td><td>{{ s.relation }}</td></tr>
+      {% else %}
+        <tr><td colspan="5" class="text-center text-muted">Недостаточно данных</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
